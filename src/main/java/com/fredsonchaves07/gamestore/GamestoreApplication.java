@@ -17,8 +17,8 @@ public class GamestoreApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ResponseEntity<String> igdbApiClient = new IgdbApiClient().obterDadosJogo("");
-		System.out.println("Obtendo jogo...");
-		System.out.println(igdbApiClient.getBody());
+//		ResponseEntity<String> igdbApiClient = new IgdbApiClient().obterDadosJogo("");
+//		System.out.println("Obtendo jogo...");
+//		System.out.println(igdbApiClient.getBody());
 	}
 }
