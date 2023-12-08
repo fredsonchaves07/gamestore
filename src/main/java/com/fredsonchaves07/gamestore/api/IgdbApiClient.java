@@ -1,9 +1,7 @@
 package com.fredsonchaves07.gamestore.api;
 
 import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
-import com.fredsonchaves07.gamestore.domain.entities.Game;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -48,7 +46,7 @@ public class IgdbApiClient {
         return JsonParser.parseString(Objects.requireNonNull(response.getBody())).getAsJsonObject().get("count").getAsInt();
     }
 
-    public List<GameDTO> getGameByPlatform(int plataform_id, int offset) {
+    public List<GameDTO> getGameByPlatform(int plataform_id, int offset, String platformName) {
         List<GameDTO> games = new ArrayList<>();
         String query = String.format("""
                     fields id, name, url;
@@ -68,7 +66,8 @@ public class IgdbApiClient {
                     new GameDTO(
                             element.getAsJsonObject().get("id").getAsInt(),
                             element.getAsJsonObject().get("name").getAsString(),
-                            element.getAsJsonObject().get("url").getAsString()
+                            element.getAsJsonObject().get("url").getAsString(),
+                            platformName
                     )
             );
         }
@@ -95,7 +94,7 @@ public class IgdbApiClient {
         return response;
     }
 
-    public GameDTO getGameByName(String name) {
+    public GameDTO getGameByName(String name, String platformName) {
         GameDTO gameDTO = null;
         String query = String.format("""
                     fields id, name, url;
@@ -114,7 +113,8 @@ public class IgdbApiClient {
                     new GameDTO(
                             element.getAsJsonObject().get("id").getAsInt(),
                             element.getAsJsonObject().get("name").getAsString(),
-                            element.getAsJsonObject().get("url").getAsString()
+                            element.getAsJsonObject().get("url").getAsString(),
+                            platformName
                     );
         }
         return gameDTO;

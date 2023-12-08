@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface GameRepository extends JpaRepository<Game, Integer> {
 
-    @Query("SELECT g FROM Game g WHERE g.finished_at != null")
+    @Query("SELECT g FROM Game g WHERE g.finishedAt != null")
     List<Game> findAllGamesFinished();
 }

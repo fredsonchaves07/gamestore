@@ -2,7 +2,6 @@ package com.fredsonchaves07.gamestore.domain.services;
 
 import com.fredsonchaves07.gamestore.api.IgdbApiClient;
 import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
-import com.fredsonchaves07.gamestore.domain.entities.Game;
 import com.fredsonchaves07.gamestore.domain.entities.Platform;
 import com.fredsonchaves07.gamestore.domain.repositories.GameRepository;
 import com.fredsonchaves07.gamestore.domain.repositories.PlatformRepository;
@@ -34,8 +33,6 @@ public class GameService {
 
     @Transactional
     public GameDTO draw() throws InterruptedException {
-        System.out.println();
-        System.out.println("Bem vindo a plataforma de sorteio :)");
         Platform platform = drawPlatform();
         Thread.sleep(2000);
         GameDTO game = drawGameByPlatform(platform);
@@ -97,7 +94,6 @@ public class GameService {
             }
         }
         Platform selectedPlataform = (Platform) plataformSelectedList.keySet().toArray()[0];
-        System.out.println("O próximo jogo será da plataforma: " + selectedPlataform.getName());
         return selectedPlataform;
     }
 
@@ -159,10 +155,9 @@ public class GameService {
     }
 
     private GameDTO drawGameByPlatform(Platform platform) throws InterruptedException {
-        System.out.println("Sorteando o jogo...");
         List<GameDTO> gameList = new ArrayList<>();
         List<GameDTO> gamesFinished = gameRepository.findAllGamesFinished().stream().map(
-                game -> new GameDTO(game.getId(), game.getName(), null)
+                game -> new GameDTO(game.getId(), game.getName(), null, null)
         ).toList();
         if (isSelectGamePlatformByFile(platform)) {
             gameList = getGamesByFile(platform);
@@ -171,7 +166,7 @@ public class GameService {
             int limit = (gameCount / 500) + 1;
             int ofset = 0;
             for (int i = 1; i <= limit; i ++) {
-                List<GameDTO> gameApiList = igdbApiClient.getGameByPlatform(platform.getId(), ofset);
+                List<GameDTO> gameApiList = igdbApiClient.getGameByPlatform(platform.getId(), ofset, platform.getName());
                 for (GameDTO game : gameApiList) {
                     if (!gameList.contains(game) && !gamesFinished.contains(game)) {
                         gameList.add(game);
@@ -232,7 +227,6 @@ public class GameService {
             }
         }
         GameDTO selectedGame = (GameDTO) gameSelectedList.keySet().toArray()[0];
-        System.out.println("O Jogo será " + selectedGame.getName());
         return selectedGame;
     }
 
@@ -244,7 +238,7 @@ public class GameService {
         List<String> gameNameList = new ArrayList<>();
         List<GameDTO> gameDTOList = new ArrayList<>();
         List<GameDTO> gamesFinished = gameRepository.findAllGamesFinished().stream().map(
-                game -> new GameDTO(game.getId(), game.getName(), null)
+                game -> new GameDTO(game.getId(), game.getName(), null, null)
         ).toList();
         Resource resource = null;
         if (platform.getId().equals(48)) {
@@ -261,7 +255,7 @@ public class GameService {
             throw new RuntimeException(e);
         }
         for (String name : gameNameList) {
-            gameDTOList.add(igdbApiClient.getGameByName(name));
+            gameDTOList.add(igdbApiClient.getGameByName(name, platform.getName()));
         }
         gameDTOList.removeIf(gamesFinished::contains);
         return gameDTOList;
