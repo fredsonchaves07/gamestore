@@ -1,7 +1,9 @@
 package com.fredsonchaves07.gamestore.domain.services;
 
 import com.fredsonchaves07.gamestore.api.IgdbApiClient;
+import com.fredsonchaves07.gamestore.domain.dtos.FinishGameDTO;
 import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
+import com.fredsonchaves07.gamestore.domain.entities.Game;
 import com.fredsonchaves07.gamestore.domain.entities.Platform;
 import com.fredsonchaves07.gamestore.domain.repositories.GameRepository;
 import com.fredsonchaves07.gamestore.domain.repositories.PlatformRepository;
@@ -35,6 +37,15 @@ public class GameService {
     public GameDTO draw() throws InterruptedException {
         Platform platform = drawPlatform();
         Thread.sleep(2000);
+        GameDTO game = drawGameByPlatform(platform);
+        platform.setLastChosen(true);
+        return game;
+    }
+
+    @Transactional
+    public GameDTO drawByPlatform(int platformId) throws InterruptedException {
+        Platform platform = platformRepository.findById(platformId).get();
+        if (!platform.isLastChosen()) throw new Error("Please draw game by /draw");
         GameDTO game = drawGameByPlatform(platform);
         platform.setLastChosen(true);
         return game;
@@ -157,7 +168,7 @@ public class GameService {
     private GameDTO drawGameByPlatform(Platform platform) throws InterruptedException {
         List<GameDTO> gameList = new ArrayList<>();
         List<GameDTO> gamesFinished = gameRepository.findAllGamesFinished().stream().map(
-                game -> new GameDTO(game.getId(), game.getName(), null, null)
+                game -> new GameDTO(game.getId(), game.getName(), platform.getId())
         ).toList();
         if (isSelectGamePlatformByFile(platform)) {
             gameList = getGamesByFile(platform);
@@ -238,7 +249,7 @@ public class GameService {
         List<String> gameNameList = new ArrayList<>();
         List<GameDTO> gameDTOList = new ArrayList<>();
         List<GameDTO> gamesFinished = gameRepository.findAllGamesFinished().stream().map(
-                game -> new GameDTO(game.getId(), game.getName(), null, null)
+                game -> new GameDTO(game.getId(), game.getName(), platform.getId())
         ).toList();
         Resource resource = null;
         if (platform.getId().equals(48)) {
@@ -259,5 +270,24 @@ public class GameService {
         }
         gameDTOList.removeIf(gamesFinished::contains);
         return gameDTOList;
+    }
+
+    @Transactional
+    public GameDTO finish(FinishGameDTO finishGameDTO) {
+        int gameId = finishGameDTO.id();
+        Game game = gameRepository.findById(gameId).orElse(igdbApiClient.getGameById(gameId));
+        Set<Integer> platformsId = igdbApiClient.getPlatformsIdByGameId(gameId);
+        for (Integer platformId : platformsId) {
+            platformRepository.findById(platformId).ifPresent(game::addPlatform);
+        }
+        game.setFinishTime(finishGameDTO.finishTime().toSecondOfDay());
+        game.setFinishCondition(finishGameDTO.finishCondition());
+        game.setRating(finishGameDTO.rating());
+        game.setGold(finishGameDTO.isGold());
+        game.setPlatina(finishGameDTO.isPlatina());
+        game.setPlatformId(finishGameDTO.platformId());
+        game.setFinishedAt(finishGameDTO.finishedAt());
+        gameRepository.save(game);
+        return GameDTO.from(game);
     }
 }

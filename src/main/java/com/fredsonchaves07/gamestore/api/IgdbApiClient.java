@@ -1,6 +1,8 @@
 package com.fredsonchaves07.gamestore.api;
 
 import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
+import com.fredsonchaves07.gamestore.domain.entities.Game;
+import com.fredsonchaves07.gamestore.domain.entities.Platform;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,10 +10,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 public class IgdbApiClient {
@@ -24,6 +23,9 @@ public class IgdbApiClient {
 
     @Value("${api.url.database.games}")
     private String apiGamesUrl;
+
+    @Value("${api.url.database.platforms}")
+    private String apiPlatformsUrl;
 
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
@@ -46,6 +48,7 @@ public class IgdbApiClient {
         return JsonParser.parseString(Objects.requireNonNull(response.getBody())).getAsJsonObject().get("count").getAsInt();
     }
 
+    //TODO -> Refatorar para retornar Game ao invés de GameDTO
     public List<GameDTO> getGameByPlatform(int plataform_id, int offset, String platformName) {
         List<GameDTO> games = new ArrayList<>();
         String query = String.format("""
@@ -118,5 +121,76 @@ public class IgdbApiClient {
                     );
         }
         return gameDTO;
+    }
+
+    public Game getGameById(int gameId) {
+        Game game = null;
+        String query = String.format("""
+                    fields id, name, url, platforms;
+                    where id = %d;
+        """, gameId);
+        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiGamesUrl,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+        for (JsonElement element : JsonParser.parseString(response.getBody()).getAsJsonArray()) {
+            game =
+                    new Game(
+                            element.getAsJsonObject().get("id").getAsInt(),
+                            element.getAsJsonObject().get("name").getAsString(),
+                            element.getAsJsonObject().get("url").getAsString()
+                    );
+        }
+        return game;
+    }
+
+    public Platform getPlatformById(int platformId) {
+        Platform platform = null;
+        String query = String.format("""
+                    fields id, name;
+                    where id = %d;
+        """, platformId);
+        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiPlatformsUrl,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+        for (JsonElement element : JsonParser.parseString(response.getBody()).getAsJsonArray()) {
+            platform = new Platform(
+                    element.getAsJsonObject().get("id").getAsInt(),
+                    element.getAsJsonObject().get("name").getAsString()
+            );
+        }
+        return platform;
+    }
+
+    public Set<Integer> getPlatformsIdByGameId(int gameId) {
+        Set<Integer> platformsId = new HashSet<>();
+        String query = String.format("""
+                    fields platforms.id;
+                    where id = %d;
+        """, gameId);
+        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiGamesUrl,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+        for (JsonElement element : JsonParser.parseString(response.getBody()).getAsJsonArray()) {
+            List<JsonElement> jsonElements = element.getAsJsonObject().get("platforms").getAsJsonArray().asList();
+            for (JsonElement jsonElement : jsonElements) {
+                platformsId.add(jsonElement.getAsJsonObject().get("id").getAsInt());
+            }
+        }
+        return platformsId;
     }
 }
