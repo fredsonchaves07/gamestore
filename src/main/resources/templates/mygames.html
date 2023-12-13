@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Lista de Jogos</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Adicione outras bibliotecas ou estilos conforme necessário -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Minha Lista de Jogos</h1>
+
+    <div class="row">
+        <!-- Exemplo de card para um jogo -->
+        <div th:each="game : ${games}" class="col-md-4">
+            <div class="card" >
+                <img th:src="${game.coverUrl}" class="card-img-top" alt="Imagem do Jogo">
+                <div class="card-body">
+                    <h5 th:text="${game.name}" class="card-title"></h5>
+                    <p th:text="${game.platformName}" class="card-text"></p>
+                    <p th:text="'Rating: ' + ${game.rating}" class="card-text"></p>
+                    <p th:text="'Finalizado em ' + ${game.finishedAt}" class="card-text"></p>
+                    <p th:text="'Horas Jogadas: ' + ${game.finishTime} + 'h'" class="card-text"></p>
+                    <!-- Adicione mais informações conforme necessário -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Adicione mais cards conforme necessário -->
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Adicione outros scripts conforme necessário -->
+</body>
+</html>
