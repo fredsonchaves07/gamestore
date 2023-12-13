@@ -3,6 +3,7 @@ package com.fredsonchaves07.gamestore.domain.services;
 import com.fredsonchaves07.gamestore.api.IgdbApiClient;
 import com.fredsonchaves07.gamestore.domain.dtos.FinishGameDTO;
 import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
+import com.fredsonchaves07.gamestore.domain.dtos.MyGamesFinishedDTO;
 import com.fredsonchaves07.gamestore.domain.entities.Game;
 import com.fredsonchaves07.gamestore.domain.entities.Platform;
 import com.fredsonchaves07.gamestore.domain.repositories.GameRepository;
@@ -289,5 +290,10 @@ public class GameService {
         game.setFinishedAt(finishGameDTO.finishedAt());
         gameRepository.save(game);
         return GameDTO.from(game);
+    }
+
+    public List<MyGamesFinishedDTO> getGamesFinished() {
+        List<Game> allGamesFinished = gameRepository.findAllGamesFinished();
+        return allGamesFinished.stream().map(MyGamesFinishedDTO::from).toList();
     }
 }

@@ -126,7 +126,7 @@ public class IgdbApiClient {
     public Game getGameById(int gameId) {
         Game game = null;
         String query = String.format("""
-                    fields id, name, url, platforms;
+                    fields id, name, cover.url;
                     where id = %d;
         """, gameId);
         HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
@@ -142,7 +142,7 @@ public class IgdbApiClient {
                     new Game(
                             element.getAsJsonObject().get("id").getAsInt(),
                             element.getAsJsonObject().get("name").getAsString(),
-                            element.getAsJsonObject().get("url").getAsString()
+                            element.getAsJsonObject().get("cover").getAsJsonObject().get("url").getAsString()
                     );
         }
         return game;

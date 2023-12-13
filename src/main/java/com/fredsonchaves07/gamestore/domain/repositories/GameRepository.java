@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface GameRepository extends JpaRepository<Game, Integer> {
 
-    @Query("SELECT g FROM Game g WHERE g.finishedAt != null")
+    @Query("SELECT g FROM Game g WHERE g.finishedAt IS NOT NULL ORDER BY g.finishedAt desc")
     List<Game> findAllGamesFinished();
 }
