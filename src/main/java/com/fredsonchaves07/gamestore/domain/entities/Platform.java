@@ -20,6 +20,8 @@ public class Platform {
 
     private boolean isLastChosen = false;
 
+    private String logoUrl;
+
     @CreationTimestamp
     @Column(nullable = false, columnDefinition = "datetime")
     private LocalDateTime createdAt;
@@ -93,5 +95,13 @@ public class Platform {
 
     public void setGames(Set<Game> games) {
         this.games = games;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 }

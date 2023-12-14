@@ -30,9 +30,8 @@ header a{
 
 .games-list{
     display: grid;
-    grid-template-columns: 0.3fr 2fr 1.5fr 0.8fr 0.5fr 0.5fr 3fr;
-    gap: 10px 0px
-    margin-top: 3%;
+    grid-template-columns: 0.3fr 3fr 0.3fr 0.8fr 0.5fr 0.5fr 3fr;
+    gap: 5px 0px;
     margin-bottom: 7%;
     text-align: center;
     margin-top: 40px
@@ -50,18 +49,62 @@ header a{
 
 .games-list .games-gold {
     background-color: #B8860B;
-    color: #fff
+    color: #fff;
+    border-radius: 15px;
+    margin: auto 30px;
 }
 
 .games-list .games-platina {
     background-color: #5F9EA0;
-    color: #111
+    color: #111;
+    border-radius: 15px;
+    margin: auto 30px;
 }
 
 .games-list img {
-    width: 100%;
     border-radius: 10%;
-    margin: 5px auto;
+}
+
+.games-list .games-img-game {
+    width: 80%;
+}
+
+.games-list .games-img-platform {
+    width: 45%;
+    margin: auto;
+}
+
+.games-list .games-rating {
+    border-radius: 15px;
+    margin: auto 10px;
+}
+
+.games-list .games-rating-0 {
+    background-color: #686868;
+}
+
+.games-list .games-rating-1 {
+    background-color: #ee5b4f;
+}
+
+.games-list .games-rating-2 {
+    background-color: #f1a065;
+}
+
+.games-list .games-rating-3 {
+    background-color: #ffdf7f;
+}
+
+.games-list .games-rating-4 {
+    background-color: #4ee476;
+}
+
+.games-list .games-rating-5 {
+    background-color: #38a555;
+}
+
+.games-list .games-rating-6 {
+    background-color: #619bfc;
 }
 
 footer{
@@ -79,4 +122,3 @@ span{
     font-size: 12px;
     color: #999;
 }
-

@@ -1,6 +1,5 @@
 package com.fredsonchaves07.gamestore.web;
 
-import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
 import com.fredsonchaves07.gamestore.domain.dtos.MyGamesFinishedDTO;
 import com.fredsonchaves07.gamestore.domain.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;

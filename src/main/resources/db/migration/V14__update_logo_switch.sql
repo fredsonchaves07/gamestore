@@ -1,0 +1,1 @@
+UPDATE platforms SET logo_url = '//images.igdb.com/igdb/image/upload/t_logo_med/pl6b.png' WHERE id =130;

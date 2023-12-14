@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +9,7 @@
 </head>
 <body>
     <main>
-        <header>
-            <a href="/sobre">Meus Jogos</a>
-            <a href="/receitas">Sortear</a>
-        </header>
+        <div th:replace="fragments/header :: header"></div>
     <div class="games-list">
         <div class="nav-games-list"></div>
         <div class="nav-games-list">Jogos Zerados</div>
@@ -22,19 +19,17 @@
         <div class="nav-games-list">Nota</div>
         <div class="nav-games-list">Condição de Zeramento</div>
         <th:block th:each="game : ${games}">
-        <img th:src="${game.coverUrl}">
+        <img th:src="${game.coverUrl}" class="games-img-game">
         <div th:text="${game.name}" class="games"></div>
-        <div th:text="${game.platformName}" class="games"></div>
+        <img th:src="${game.platformLogoUrl}" class="games-img-platform">
         <div th:text="${game.finishedAt}" class="games"></div>
         <div th:text="${game.finishTime} + 'h'" class="games"></div>
-        <div th:text="${game.rating}" class="games"></div>
+        <div th:class="'games games-rating games-rating-' + ${game.rating}" th:text="${game.rating}"></div>
         <div th:class="${game.isGold} ? 'games games-gold' : 'games' + (${game.isPlatina} ? ' games-platina' : '')" th:text="${game.finishCondition}" class="games"></div>
         </th:block>
     </div>
     </main>
-    <footer>
-        <p>&copy; Todos os direitos reservados a Game Store</p>
-    </footer>
+    <div th:replace="fragments/footer :: footer"></div>
     <script type="text/javascript" src="/js/scripts.js"></script>
 </body>
 </html>
