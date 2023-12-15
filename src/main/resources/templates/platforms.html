@@ -12,6 +12,7 @@
 <main>
     <div class="platforms-list">
         <th:block th:each="platform : ${platforms}">
+            <a th:href="@{/platforms/{id}(id=${platform.id})}">
         <div class="platform-detail">
             <img th:src="${platform.logoUrl}">
             <div class="platform-detail-info">
@@ -19,6 +20,7 @@
                 <div th:class="${platform.progress >= 100} ? 'platform-detail-progress platform-detail-progress-100' : 'platform-detail-progress' + (${platform.progress > 0} ? ' platform-detail-progress-1' : '')" th:text="${platform.progress} + '% Concluído'"></div>
             </div>
         </div>
+            </a>
         </th:block>
     </div>
 </main>
