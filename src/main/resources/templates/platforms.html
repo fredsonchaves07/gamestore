@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <title>Meus jogos</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+<main>
+    <div class="platforms-list">
+        <th:block th:each="platform : ${platforms}">
+        <div class="platform-detail">
+            <img th:src="${platform.logoUrl}">
+            <div class="platform-detail-info">
+                <div th:text="${platform.gamesCount} + ' Jogos'" class="platform-detail-count"></div>
+                <div th:class="${platform.progress >= 100} ? 'platform-detail-progress platform-detail-progress-100' : 'platform-detail-progress' + (${platform.progress > 0} ? ' platform-detail-progress-1' : '')" th:text="${platform.progress} + '% Concluído'"></div>
+            </div>
+        </div>
+        </th:block>
+    </div>
+</main>
+<div th:replace="fragments/footer :: footer"></div>
+<script type="text/javascript" src="/js/scripts.js"></script>
+</body>
+</html>

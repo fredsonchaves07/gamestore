@@ -48,6 +48,21 @@ public class IgdbApiClient {
         return JsonParser.parseString(Objects.requireNonNull(response.getBody())).getAsJsonObject().get("count").getAsInt();
     }
 
+    public int getCountGamesByListGamesIdAndPlatformId(List<Integer> gamesId,  int platformId) {
+        String query = String.format("""
+                    where id = %s & platforms = (%d);
+                   """,  gamesId.toString().replace("[", "(").replace("]", ")"), platformId);
+        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiGamesUrl + "/count",
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+        return JsonParser.parseString(Objects.requireNonNull(response.getBody())).getAsJsonObject().get("count").getAsInt();
+    }
+
     //TODO -> Refatorar para retornar Game ao invés de GameDTO
     public List<GameDTO> getGameByPlatform(int plataform_id, int offset, String platformName) {
         List<GameDTO> games = new ArrayList<>();
@@ -95,6 +110,34 @@ public class IgdbApiClient {
         );
 
         return response;
+    }
+
+    public Game getGameByIdAndPlatformId(int gameId, int platformId) {
+        Game game = null;
+        String query = String.format("""
+                    fields id, name, cover.url;
+                    where id = %d & platforms.id = %d;
+                   """,  gameId, platformId);
+        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiGamesUrl,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        for (JsonElement element : JsonParser.parseString(response.getBody()).getAsJsonArray()) {
+            game =
+                    new Game(
+                            element.getAsJsonObject().get("id").getAsInt(),
+                            element.getAsJsonObject().get("name").getAsString(),
+                            element.getAsJsonObject().get("cover").getAsJsonObject().get("url").getAsString()
+                    );
+        }
+        return game;
     }
 
     public GameDTO getGameByName(String name, String platformName) {

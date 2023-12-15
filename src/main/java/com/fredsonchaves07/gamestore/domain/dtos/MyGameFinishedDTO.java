@@ -6,7 +6,7 @@ import com.fredsonchaves07.gamestore.domain.entities.Platform;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public record MyGamesFinishedDTO(
+public record MyGameFinishedDTO(
         Integer id,
         String name,
         Integer platformId,
@@ -21,13 +21,13 @@ public record MyGamesFinishedDTO(
         String finishTime
 ) {
 
-    public static MyGamesFinishedDTO from(Game game) {
+    public static MyGameFinishedDTO from(Game game) {
         Platform platform = game
                 .getPlatforms()
                 .stream()
                 .filter(platformGame -> platformGame.getId() == game.getPlatformId())
                 .findFirst().orElseThrow();
-        return new MyGamesFinishedDTO(
+        return new MyGameFinishedDTO(
                 game.getId(),
                 game.getName(),
                 game.getPlatformId(),

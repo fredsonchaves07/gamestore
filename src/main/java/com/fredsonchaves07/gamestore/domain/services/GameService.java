@@ -3,7 +3,7 @@ package com.fredsonchaves07.gamestore.domain.services;
 import com.fredsonchaves07.gamestore.api.IgdbApiClient;
 import com.fredsonchaves07.gamestore.domain.dtos.FinishGameDTO;
 import com.fredsonchaves07.gamestore.domain.dtos.GameDTO;
-import com.fredsonchaves07.gamestore.domain.dtos.MyGamesFinishedDTO;
+import com.fredsonchaves07.gamestore.domain.dtos.MyGameFinishedDTO;
 import com.fredsonchaves07.gamestore.domain.entities.Game;
 import com.fredsonchaves07.gamestore.domain.entities.Platform;
 import com.fredsonchaves07.gamestore.domain.repositories.GameRepository;
@@ -292,8 +292,19 @@ public class GameService {
         return GameDTO.from(game);
     }
 
-    public List<MyGamesFinishedDTO> getGamesFinished() {
+    public List<MyGameFinishedDTO> getGamesFinished() {
         List<Game> allGamesFinished = gameRepository.findAllGamesFinished();
-        return allGamesFinished.stream().map(MyGamesFinishedDTO::from).toList();
+        return allGamesFinished.stream().map(MyGameFinishedDTO::from).toList();
+    }
+
+    public List<MyGameFinishedDTO> getGamesFinishedByPlatformId(int platformId) {
+        List<MyGameFinishedDTO> myGameFinishedDTOS = new ArrayList<>();
+        for (Game game : gameRepository.findAllGamesFinished()) {
+            Game gameByIdAndPlatformId = igdbApiClient.getGameByIdAndPlatformId(game.getId(), platformId);
+            if (gameByIdAndPlatformId != null) {
+                myGameFinishedDTOS.add(MyGameFinishedDTO.from(gameByIdAndPlatformId));
+            }
+        }
+        return myGameFinishedDTOS;
     }
 }

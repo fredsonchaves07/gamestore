@@ -1,6 +1,6 @@
 package com.fredsonchaves07.gamestore.web;
 
-import com.fredsonchaves07.gamestore.domain.dtos.MyGamesFinishedDTO;
+import com.fredsonchaves07.gamestore.domain.dtos.MyGameFinishedDTO;
 import com.fredsonchaves07.gamestore.domain.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,7 +17,7 @@ public class GameController {
 
     @GetMapping("/")
     public String myGames(Model model) {
-        List<MyGamesFinishedDTO> gamesFinished = gameService.getGamesFinished();
+        List<MyGameFinishedDTO> gamesFinished = gameService.getGamesFinished();
         model.addAttribute("games", gamesFinished);
         return "index";
     }
