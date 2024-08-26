@@ -119,14 +119,38 @@ header a{
     gap: 30px 0px;
 }
 
+.platform-games-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 0px;
+}
+
 .platforms-list  .platform-detail {
     display: grid;
     grid-template-rows: 2fr 1fr;
 }
 
+.platform-games-list .platform-game-detail {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-content: center;
+    align-items: center;
+}
+
 .platforms-list  .platform-detail img {
     margin: auto;
     width: 40%;
+}
+
+.platform-games-list .platform-game-detail img {
+    margin: auto;
+    width: 50%;
+}
+
+.platform-games-list .platform-game-detail .platform-game-detail-info{
+    display: grid;
+    gap: 5px;
+    grid-template-rows: 1fr 1fr 1fr;
 }
 
 .platforms-list  .platform-detail .platform-detail-info{
@@ -143,6 +167,10 @@ header a{
     color: #999;
 }
 
+.platform-games-list .platform-game-detail .platform-game-detail-info .platform-game-detail-name{
+    color: #999;
+}
+
 .platforms-list  .platform-detail .platform-detail-info .platform-detail-progress {
     color: rgba(1, 1, 1, 60%);
     border-radius: 10px;
@@ -150,6 +178,12 @@ header a{
 }
 
 .platform-detail-progress-100 {
+    background-color: #4ee476;
+}
+
+.platform-game-detail-finishedAt {
+    border-radius: 10px;
+    margin: auto 70px;
     background-color: #4ee476;
 }
 

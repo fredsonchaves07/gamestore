@@ -38,4 +38,12 @@ public class PlatformService {
         }
         return allPlatformsDTOActive;
     }
+
+    public PlatformDTO getPlatformById(int id) {
+        Platform platform = platformRepository.findById(id).orElseThrow();
+        List<Integer> gamesIdFinished = gameRepository.findAllGamesFinished().stream().map(Game::getId).toList();
+        int count = igdbApiClient.getCountGamesByPlatform(platform.getId());
+        int gamesFinished = igdbApiClient.getCountGamesByListGamesIdAndPlatformId(gamesIdFinished, platform.getId());
+        return PlatformDTO.with(platform, count, gamesFinished);
+    }
 }

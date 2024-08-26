@@ -14,9 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 @Service
@@ -46,7 +44,6 @@ public class GameService {
     @Transactional
     public GameDTO drawByPlatform(int platformId) throws InterruptedException {
         Platform platform = platformRepository.findById(platformId).get();
-        if (!platform.isLastChosen()) throw new Error("Please draw game by /draw");
         GameDTO game = drawGameByPlatform(platform);
         platform.setLastChosen(true);
         return game;
@@ -243,7 +240,7 @@ public class GameService {
     }
 
     private boolean isSelectGamePlatformByFile(Platform platform) {
-        return platform.getId().equals(48) || platform.getId().equals(6);
+        return platform.getId().equals(48) || platform.getId().equals(6) || platform.getId().equals(130);
     }
 
     private List<GameDTO> getGamesByFile(Platform platform) {
@@ -257,6 +254,8 @@ public class GameService {
             resource = resourceLoader.getResource("classpath:" + "playstation.txt");
         } else if (platform.getId().equals(6)) {
             resource = resourceLoader.getResource("classpath:" + "pc.txt");
+        } else if (platform.getId().equals(130)) {
+            resource = resourceLoader.getResource("classpath:" + "nintendo.txt");
         }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
@@ -306,5 +305,56 @@ public class GameService {
             }
         }
         return myGameFinishedDTOS;
+    }
+
+    public List<GameDTO> getGamesByPlatformId(int platformId) {
+        List<Game> gameList = new ArrayList<>();
+        List<Integer> gamesFinishedIds = gameRepository.findAllGamesFinished().stream().filter(game -> game.getPlatforms().contains(platformRepository.findById(platformId).orElseThrow())).toList().stream().map(Game::getId).toList();
+        int gameCount = igdbApiClient.getCountGamesByPlatform(platformId);
+        int limit = (gameCount / 500) + 1;
+        int ofset = 0;
+        for (int i = 1; i <= limit; i++) {
+            List<Game> gameApiList = igdbApiClient.getGamesByPlatformId(platformId, ofset);
+            for (Game game : gameApiList) {
+                if (!gameList.contains(game) && gamesFinishedIds.contains(game.getId())) {
+                    gameList.add(gameRepository.findById(game.getId()).orElseThrow());
+                }
+                if (!gameList.contains(game) && !gamesFinishedIds.contains(game.getId())) {
+                    gameList.add(game);
+                }
+            }
+            if (gameList.size() == gameCount || gameApiList.size() < 500) {
+                break;
+            }
+            ofset = ofset + 500;
+        }
+        Platform platform = platformRepository.findById(platformId).orElseThrow();
+        return gameList.stream().map(game -> GameDTO.with(game, platform)).toList();
+    }
+
+    public void importGamesByPlatformfId(int platformId) {
+        try {
+            List<Game> games = new ArrayList<>();
+            FileWriter file = new FileWriter("games.txt");
+            BufferedWriter writer = new BufferedWriter(file);
+            int gameCount = igdbApiClient.getCountGamesByPlatform(platformId);
+            int limit = (gameCount / 500) + 1;
+            int ofset = 0;
+            for (int i = 1; i <= limit; i++) {
+                List<Game> gameApiList = igdbApiClient.getGamesByPlatformId(platformId, ofset);
+                for (Game game : gameApiList) {
+                    games.add(game);
+                    writer.write(game.getName());
+                    writer.newLine();
+                }
+                if (games.size() == gameCount || gameApiList.size() < 500) {
+                    break;
+                }
+                ofset = ofset + 500;
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

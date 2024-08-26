@@ -36,7 +36,7 @@ public class IgdbApiClient {
     }
 
     public int getCountGamesByPlatform(int plataform_id) {
-        String query = "where platforms = " + plataform_id + ";";
+        String query = "where platforms = (" + plataform_id + ");";
         HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(
@@ -62,6 +62,72 @@ public class IgdbApiClient {
         );
         return JsonParser.parseString(Objects.requireNonNull(response.getBody())).getAsJsonObject().get("count").getAsInt();
     }
+
+    public List<Game> getGamesByPlatformId(int plataform_id, int offset) {
+        //where platforms = (%d) -> Todos os jogos
+        //where platforms = %d -> Todos os jogos exclusivos da plataforma
+        List<Game> games = new ArrayList<>();
+        String query = String.format("""
+                    fields id, name, cover.url;
+                    where platforms = %d;
+                    limit 500;
+                    offset %d;
+                    sort name;
+                    """,  plataform_id, offset);
+        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiGamesUrl,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+        for (JsonElement element : JsonParser.parseString(response.getBody()).getAsJsonArray()) {
+            String coverUrl = null;
+            if (element.getAsJsonObject().get("cover") != null) {
+                coverUrl = element.getAsJsonObject().get("cover").getAsJsonObject().get("url").getAsString();
+            }
+            games.add(
+                    new Game(
+                            element.getAsJsonObject().get("id").getAsInt(),
+                            element.getAsJsonObject().get("name").getAsString(),
+                            coverUrl
+                    )
+            );
+        }
+        return games;
+    }
+//
+//    public List<Game> getGamesByPlatformIdWithIdsExcludeList(int plataform_id, int offset, List<Integer> gameIdsExclude) {
+//        List<Game> games = new ArrayList<>();
+//        String query = String.format("""
+//                    fields id, name, cover.url;
+//                    where platforms = %d & id != %s;
+//                    limit 500;
+//                    offset %d;""",  plataform_id, gameIdsExclude.toString().replace("[", "(").replace("]", ")"),offset);
+//        HttpEntity<String> entity = new HttpEntity<>(query, getHeaders());
+//        RestTemplate restTemplate = new RestTemplate();
+//        ResponseEntity<String> response = restTemplate.exchange(
+//                apiGamesUrl,
+//                HttpMethod.POST,
+//                entity,
+//                String.class
+//        );
+//        for (JsonElement element : JsonParser.parseString(response.getBody()).getAsJsonArray()) {
+//            String coverUrl = null;
+//            if (element.getAsJsonObject().get("cover") != null) {
+//                coverUrl = element.getAsJsonObject().get("cover").getAsJsonObject().get("url").getAsString();
+//            }
+//            games.add(
+//                    new Game(
+//                            element.getAsJsonObject().get("id").getAsInt(),
+//                            element.getAsJsonObject().get("name").getAsString(),
+//                            coverUrl
+//                    )
+//            );
+//        }
+//        return games;
+//    }
 
     //TODO -> Refatorar para retornar Game ao invés de GameDTO
     public List<GameDTO> getGameByPlatform(int plataform_id, int offset, String platformName) {
